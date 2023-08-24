@@ -6,7 +6,6 @@
 class TestBench
 {
 protected:
-	bool is_run = false;
 	float test_time = 0.0f;
 
 	virtual int MakeStep(Engine& engine) = 0;
@@ -26,6 +25,9 @@ public:
 	float GetEngineMaxTemperature();
 
 protected:
+	bool CheckOverheat(Engine& engine);
+	bool CheckReachableOfOverheat(Engine& engine);
+	void UpdateMaxTemperature(Engine& engine);
 	int MakeStep(Engine& engine);
 
 	float engine_max_temperature = -1.0f;
@@ -39,6 +41,9 @@ public:
 	float GetVelocityAtMaxPower();
 
 protected:
+	void UpdateMaxPower(Engine& engine);
+	void UpdateMaxVelocity(Engine& engine);
+	bool CheckOverVelocity(Engine& engine);
 	int MakeStep(Engine& engine);
 
 	float engine_max_power = -1.0f;

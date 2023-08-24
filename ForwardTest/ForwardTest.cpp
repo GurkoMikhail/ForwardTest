@@ -31,7 +31,7 @@ int RunPowerTest()
 
 	PowerTestBench power_test_bench;
 
-	if (power_test_bench.RunTest(engine) > 0)
+	if (power_test_bench.RunTest(engine) != ReturnCodes::Success)
 	{
 		std::cout << "Power test error\n";
 		return ReturnCodes::Failure;

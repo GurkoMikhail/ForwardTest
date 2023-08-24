@@ -55,7 +55,6 @@ public:
 
 	/*-------------------SETTERS------------------------*/
 	void SetInertia(float inertia);
-	void PushVelocityToMomentPoint(float velocity, float moment);
 	void SetHeatToMomentCoeff(float heat_to_moment_coeff);
 	void SetHeatToVelocityCoeff(float heat_to_velocity_coeff);
 	void SetCoolingCoeff(float cooling_coeff);

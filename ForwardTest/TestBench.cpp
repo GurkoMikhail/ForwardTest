@@ -9,19 +9,17 @@ float TestBench::GetTestTime()
 int TestBench::RunTest(Engine& engine)
 {
 	int result = ReturnCodes::Failure;
-	is_run = true;
 	test_time = 0.0f;
 	engine.Start();
-	while (is_run)
+	while (engine.GetRunStatus())
 	{
 		result = MakeStep(engine);
 		if (result != ReturnCodes::Success)
 		{
-			break;
+			engine.Stop();
 		}
 		test_time += Time::delta_time;
 	}
-	engine.Stop();
 	return result;
 }
 /*-----------------------------TestBench----------------------------*/
@@ -30,21 +28,31 @@ int TestBench::RunTest(Engine& engine)
 /*-------------------------SuperheatTestBench-----------------------*/
 float SuperheatTestBench::GetEngineMaxTemperature() { return engine_max_temperature; }
 
-int SuperheatTestBench::MakeStep(Engine & engine)
+bool SuperheatTestBench::CheckOverheat(Engine& engine)
 {
-	if (engine.GetSuperheatTemperature() <= engine.GetCurrentTemperature())
-	{
-		is_run = false;
-	}
+	return engine.GetSuperheatTemperature() <= engine.GetCurrentTemperature();
+}
 
-	if (abs(engine.GetCurrentTemperature() - engine_max_temperature) < Accuracy::max_delta_temperature)
+bool SuperheatTestBench::CheckReachableOfOverheat(Engine& engine)
+{
+	return abs(engine.GetCurrentTemperature() - engine_max_temperature) < Accuracy::max_delta_temperature;
+}
+
+void SuperheatTestBench::UpdateMaxTemperature(Engine& engine)
+{
+	engine_max_temperature = std::max(engine.GetCurrentTemperature(), engine_max_temperature);
+}
+
+int SuperheatTestBench::MakeStep(Engine& engine)
+{
+	if (CheckOverheat(engine)) { engine.Stop(); }
+	if (CheckReachableOfOverheat(engine))
 	{
-		is_run = false;
+		engine.Stop();
 		test_time = INFINITY;
 		return ReturnCodes::NonOverheat;
 	}
-
-	engine_max_temperature = std::max(engine.GetCurrentTemperature(), engine_max_temperature);
+	UpdateMaxTemperature(engine);
 	return engine.SetNextState();
 }
 /*-------------------------SuperheatTestBench-----------------------*/
@@ -61,20 +69,36 @@ float PowerTestBench::GetVelocityAtMaxPower()
 	return engine_velocity_at_max_power;
 }
 
-int PowerTestBench::MakeStep(Engine & engine)
+void PowerTestBench::UpdateMaxPower(Engine& engine)
 {
 	float engine_current_velocity = engine.GetCurrentVelocity();
 	float engine_current_power = engine.GetCurrentPower();
+
 	if (engine_current_power > engine_max_power)
 	{
 		engine_max_power = engine_current_power;
 		engine_velocity_at_max_power = engine_current_velocity;
 	}
-	if (abs(engine_current_velocity - engine_max_velocity) < Accuracy::max_delta_velocity)
+}
+
+void PowerTestBench::UpdateMaxVelocity(Engine& engine)
+{
+	engine_max_velocity = engine.GetCurrentVelocity();
+}
+
+bool PowerTestBench::CheckOverVelocity(Engine& engine)
+{
+	return abs(engine.GetCurrentVelocity() - engine_max_velocity) < Accuracy::max_delta_velocity;
+}
+
+int PowerTestBench::MakeStep(Engine & engine)
+{
+	UpdateMaxPower(engine);
+	if (CheckOverVelocity(engine))
 	{
-		is_run = false;
+		engine.Stop();
 	}
-	engine_max_velocity = engine_current_velocity;
+	UpdateMaxVelocity(engine);
 	return engine.SetNextState();
 }
 /*---------------------------PowerTestBench-------------------------*/
