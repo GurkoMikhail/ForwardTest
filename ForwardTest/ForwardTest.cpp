@@ -5,43 +5,8 @@
 #include "TestBench.h"
 using namespace main_params;
 
-
-int RunSuperheatTest()
-{
-	InternalCombustionEngine engine(inertia, velocities, moments, superheat_temperature, heat_to_moment_coeff, heat_to_velocity_coeff, cooling_coeff);
-
-	SuperheatTestBench superheat_test_bench;
-	if (superheat_test_bench.RunTest(engine) == ReturnCodes::NonOverheat)
-	{
-		std::cout << "Engine does not superheat. Max temperature = " << superheat_test_bench.GetEngineMaxTemperature() << std::endl;
-	}
-	else
-	{
-		std::cout << "Time to superheat = " << superheat_test_bench.GetTestTime() << " seconds\n";
-		return ReturnCodes::Success;
-	}
-	return ReturnCodes::Failure;
-}
-
-
-int RunPowerTest()
-{
-	/*--------------------------PowerTest-------------------------------------*/
-	InternalCombustionEngine engine(inertia, velocities, moments, superheat_temperature, heat_to_moment_coeff, heat_to_velocity_coeff, cooling_coeff);
-
-	PowerTestBench power_test_bench;
-
-	if (power_test_bench.RunTest(engine) != ReturnCodes::Success)
-	{
-		std::cout << "Power test error\n";
-		return ReturnCodes::Failure;
-	}
-	std::cout << "Max power = " << power_test_bench.GetMaxPower() << " kWatt\n";
-	std::cout << "Velocity at max power = " << power_test_bench.GetVelocityAtMaxPower() << " rad/sec\n";
-	return ReturnCodes::Success;
-	/*--------------------------PowerTest-------------------------------------*/
-}
-
+void RunSuperheatTest();
+void RunPowerTest();
 
 int main()
 {
@@ -51,3 +16,45 @@ int main()
 	RunSuperheatTest();
 	RunPowerTest();
 }
+
+
+void RunSuperheatTest()
+{
+	InternalCombustionEngine engine(inertia, velocities, moments, superheat_temperature, heat_to_moment_coeff, heat_to_velocity_coeff, cooling_coeff);
+
+	SuperheatTestBench superheat_test_bench;
+	superheat_test_bench.AttachEngine(engine);
+
+	switch (superheat_test_bench.RunTest())
+	{
+	case ReturnCodes::Success:
+		std::cout << "Time to overheat = " << superheat_test_bench.GetTestTime() << " seconds\n";
+		break;
+	case ReturnCodes::NonOverheat:
+		std::cout << "Engine does not overheat. Max temperature = " << superheat_test_bench.GetEngineMaxTemperature() << std::endl;
+		break;
+	default:
+		std::cout << "Unknown return code" << std::endl;
+		break;
+	}
+}
+
+void RunPowerTest()
+{
+	InternalCombustionEngine engine(inertia, velocities, moments, superheat_temperature, heat_to_moment_coeff, heat_to_velocity_coeff, cooling_coeff);
+
+	PowerTestBench power_test_bench;
+	power_test_bench.AttachEngine(engine);
+
+	switch (power_test_bench.RunTest())
+	{
+	case ReturnCodes::Success:
+		std::cout << "Max power = " << power_test_bench.GetMaxPower() << " kWatt\n";
+		std::cout << "Velocity at max power = " << power_test_bench.GetVelocityAtMaxPower() << " rad/sec\n";
+		break;
+	default:
+		std::cout << "Unknown return code" << std::endl;
+		break;
+	}
+}
+

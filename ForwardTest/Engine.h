@@ -4,54 +4,71 @@
 #include "vector"
 #include "other.h"
 
+
 class Engine {
 
-protected:
-	bool is_run = false;
-	std::vector<float> velocity_vec;
-	std::vector<float> moment_vec;
-	float current_velocity = 0.0f;
-	float current_temperature = 0.0f;
-	float superheat_temperature = 0.0f;
-	float current_moment = 0.0f;
-	float current_mower = 0.0f;
-	float current_acceleration = 0.0f;
-
 public:
-	/*-------------------GETTERS------------------------*/
-	bool GetRunStatus();
-	float GetCurrentVelocity();
-	float GetCurrentTemperature();
-	float GetSuperheatTemperature();
-	float GetCurrentMoment();
-	float GetCurrentPower();
-	float GetCurrentAcceleration();
-	/*-------------------GETTERS------------------------*/
+	/*-----------------CONSTRUCTORS---------------------*/
+	Engine();
+	/*-----------------CONSTRUCTORS---------------------*/
 
-	/*-------------------CULCULATIONS-------------------*/
-	virtual float CulcCurrentMoment() = 0;
-	virtual float CulcCurrentPower() = 0;
-	virtual float CulcCurrentAcceleration() = 0;
-	/*-------------------CULCULATIONS-------------------*/
+	/*------------------DESTRUCTOR----------------------*/
+	virtual ~Engine();
+	/*------------------DESTRUCTOR----------------------*/
+
+	/*-------------------GETTERS------------------------*/
+	bool GetRunStatus() const;
+	float GetSuperheatTemperature() const;
+
+	float GetCurrentVelocity() const;
+	float GetCurrentTemperature() const;
+	float GetCurrentMoment() const;
+	float GetCurrentPower() const;
+	float GetCurrentAcceleration() const;
+	/*-------------------GETTERS------------------------*/
 
 	/*-----------------STATE-CONTROL--------------------*/
-	virtual int Update() = 0;
-	virtual int SetNextState() = 0;
+	virtual void SetNextState() = 0;
 	void Start();
 	void Stop();
 	/*-----------------STATE-CONTROL--------------------*/
 
+protected:
+	float superheat_temperature = 110.0f;
+
+	/*-----------------STATE-FIELDS---------------------*/
+	bool is_run = false;
+	float current_velocity = 0.0f;
+	float current_temperature = Temperature::ambient_temperature;
+	float current_moment = 0.0f;
+	float current_power = 0.0f;
+	float current_acceleration = 0.0f;
+	/*-----------------STATE-FIELDS---------------------*/
+
+	/*--------------HIDDEN-STATE-CONTROL----------------*/
+	virtual void SetStartState() = 0;
+	virtual void UpdateState() = 0;
+	/*--------------HIDDEN-STATE-CONTROL----------------*/
 };
 
-class InternalCombustionEngineProperties
+class InternalCombustionEngine : public Engine
 {
-protected:
-	float inertia;
-	float heat_to_moment_coeff;
-	float heat_to_velocity_coeff;
-	float cooling_coeff;
-
 public:
+	/*-----------------CONSTRUCTORS---------------------*/
+	InternalCombustionEngine(
+		float inertia = 10.0f,
+		std::vector<float> velocities = { 0.0f, 75.0f, 150.0f, 200.0f, 250.0f, 300.0f },
+		std::vector<float> moments = { 20.0f, 75.0f, 100.0f, 105.0f, 75.0f, 0.0f },
+		float superheat_temperature = 110.0f,
+		float heat_to_moment_coeff = 0.01f,
+		float heat_to_velocity_coeff = 0.0001f,
+		float cooling_coeff = 0.1f
+	);
+	/*-----------------CONSTRUCTORS---------------------*/
+
+	/*------------------DESTRUCTOR----------------------*/
+	~InternalCombustionEngine() override;
+	/*------------------DESTRUCTOR----------------------*/
 
 	/*-------------------SETTERS------------------------*/
 	void SetInertia(float inertia);
@@ -59,27 +76,28 @@ public:
 	void SetHeatToVelocityCoeff(float heat_to_velocity_coeff);
 	void SetCoolingCoeff(float cooling_coeff);
 	/*-------------------SETTERS------------------------*/
-};
 
-class InternalCombustionEngine : public Engine, public InternalCombustionEngineProperties
-{
-public:
-	InternalCombustionEngine(
-		float inertia,
-		std::vector<float> velocities,
-		std::vector<float> moments,
-		float superheat_temperature,
-		float heat_to_moment_coeff,
-		float heat_to_velocity_coeff,
-		float cooling_coeff
-	);
-	int SetNextState();
-	float CulcCurrentMoment();
-	float CulcCurrentPower();
-	float CulcCurrentAcceleration();
+	/*-----------------STATE-CONTROL--------------------*/
+	void SetNextState() override;
+	/*-----------------STATE-CONTROL--------------------*/
 
 protected:
-	int Update();
+	float inertia;
+	float heat_to_moment_coeff;
+	float heat_to_velocity_coeff;
+	float cooling_coeff;
+	std::vector<float> velocity_vec;
+	std::vector<float> moment_vec;
 
+	/*--------------HIDDEN-STATE-CONTROL----------------*/
+	void UpdateState() override;
+	void SetStartState() override;
+	/*--------------HIDDEN-STATE-CONTROL----------------*/
+
+	/*-------------------CALCULATIONS-------------------*/
+	float CalcCurrentMoment() const;
+	float CalcCurrentPower() const;
+	float CalcCurrentAcceleration() const;
+	/*-------------------CALCULATIONS-------------------*/
 };
-float LinearInterpolation(std::vector<float> const& x_vec, std::vector<float> const& y_vec, float value);
+

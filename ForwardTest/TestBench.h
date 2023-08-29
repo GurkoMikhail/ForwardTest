@@ -5,49 +5,91 @@
 
 class TestBench
 {
+public:
+	/*-----------------CONSTRUCTORS---------------------*/
+	TestBench();
+	TestBench(Engine& engine);
+	/*-----------------CONSTRUCTORS---------------------*/
+
+	/*------------------DESTRUCTOR----------------------*/
+	virtual ~TestBench();
+	/*------------------DESTRUCTOR----------------------*/
+
+	/*-------------------SETTERS------------------------*/
+	void AttachEngine(Engine& engine);
+	/*-------------------SETTERS------------------------*/
+
+	/*-------------------GETTERS------------------------*/
+	const Engine* GetAttachedEnginePtr() const;
+	float GetTestTime() const;
+	/*-------------------GETTERS------------------------*/
+
+	/*----------------STATE-CONTROL---------------------*/
+	bool CheckAttachedEngine() const;
+	int RunTest();
+	/*----------------STATE-CONTROL---------------------*/
+
 protected:
 	float test_time = 0.0f;
+	Engine* ptr_engine = nullptr;
 
-	virtual int MakeStep(Engine& engine) = 0;
-
-public:
-	/*-------------------GETTERS------------------------*/
-	float GetTestTime();
-	/*-------------------GETTERS------------------------*/
-
-	int RunTest(Engine& engine);
+	virtual int MakeStep() = 0;
 };
 
 class SuperheatTestBench : public TestBench
 {
 public:
-	SuperheatTestBench() {};
-	float GetEngineMaxTemperature();
+	/*-----------------CONSTRUCTORS---------------------*/
+	SuperheatTestBench();
+	SuperheatTestBench(Engine& engine);
+	/*-----------------CONSTRUCTORS---------------------*/
+
+	/*------------------DESTRUCTOR----------------------*/
+	virtual ~SuperheatTestBench();
+	/*------------------DESTRUCTOR----------------------*/
+
+	/*-------------------GETTERS------------------------*/
+	float GetEngineMaxTemperature() const;
+	/*-------------------GETTERS------------------------*/
 
 protected:
-	bool CheckOverheat(Engine& engine);
-	bool CheckReachableOfOverheat(Engine& engine);
-	void UpdateMaxTemperature(Engine& engine);
-	int MakeStep(Engine& engine);
+	/*----------------STATE-CONTROL---------------------*/
+	bool CheckOverheat() const;
+	bool CheckReachableOfOverheat() const;
+	void UpdateMaxTemperature();
+	int MakeStep() override;
+	/*----------------STATE-CONTROL---------------------*/
 
-	float engine_max_temperature = -1.0f;
+	float engine_max_temperature = -FLT_MAX;
 };
 
 class PowerTestBench : public TestBench
 {
 public:
-	PowerTestBench() {};
-	float GetMaxPower();
-	float GetVelocityAtMaxPower();
+	/*-----------------CONSTRUCTORS---------------------*/
+	PowerTestBench();
+	PowerTestBench(Engine& engine);
+	/*-----------------CONSTRUCTORS---------------------*/
+
+	/*------------------DESTRUCTOR----------------------*/
+	virtual ~PowerTestBench();
+	/*------------------DESTRUCTOR----------------------*/
+
+	/*-------------------GETTERS------------------------*/
+	float GetMaxPower() const;
+	float GetVelocityAtMaxPower() const;
+	/*-------------------GETTERS------------------------*/
 
 protected:
-	void UpdateMaxPower(Engine& engine);
-	void UpdateMaxVelocity(Engine& engine);
-	bool CheckOverVelocity(Engine& engine);
-	int MakeStep(Engine& engine);
+	/*----------------STATE-CONTROL---------------------*/
+	bool CheckOverVelocity() const;
+	void UpdateMaxPower();
+	void UpdateMaxVelocity();
+	int MakeStep() override;
+	/*----------------STATE-CONTROL---------------------*/
 
-	float engine_max_power = -1.0f;
-	float engine_max_velocity = -1.0f;
-	float engine_velocity_at_max_power = -1.0f;
-
+	float engine_max_power = -FLT_MAX;
+	float engine_max_velocity = -FLT_MAX;
+	float engine_velocity_at_max_power = -FLT_MAX;
 };
+

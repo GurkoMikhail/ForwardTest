@@ -1,67 +1,41 @@
 #include "Engine.h"
 
+
 /*-----------------------------Engine----------------------------*/
-bool Engine::GetRunStatus() { return is_run; }
+Engine::Engine() {}
 
-float Engine::GetCurrentVelocity() { return current_velocity; }
+Engine::~Engine() {}
 
-float Engine::GetCurrentTemperature() { return current_temperature; }
+bool Engine::GetRunStatus() const { return is_run; }
 
-float Engine::GetSuperheatTemperature() { return superheat_temperature; }
+float Engine::GetSuperheatTemperature() const { return superheat_temperature; }
 
-float Engine::GetCurrentMoment() { return current_moment; }
+float Engine::GetCurrentVelocity() const { return current_velocity; }
 
-float Engine::GetCurrentPower() { return current_mower; }
+float Engine::GetCurrentTemperature() const { return current_temperature; }
 
-float Engine::GetCurrentAcceleration() { return current_acceleration; }
+float Engine::GetCurrentMoment() const { return current_moment; }
+
+float Engine::GetCurrentPower() const { return current_power; }
+
+float Engine::GetCurrentAcceleration() const { return current_acceleration; }
 
 void Engine::Start()
 {
-	current_temperature = Temperature::ambient_temperature;
-	current_velocity = velocity_vec[0];
+	SetStartState();
 	is_run = true;
-	Update();
+	UpdateState();
 }
 
 void Engine::Stop()
 {
 	is_run = false;
-	Update();
+	UpdateState();
 }
 /*-----------------------------Engine----------------------------*/
 
 
-/*---------------InternalCombustionEngineProperties--------------*/
-void InternalCombustionEngineProperties::SetInertia(float inertia)
-{
-	this->inertia = inertia;
-}
-
-void InternalCombustionEngineProperties::SetHeatToMomentCoeff(float heat_to_moment_coeff)
-{
-	this->heat_to_moment_coeff = heat_to_moment_coeff;
-}
-
-void InternalCombustionEngineProperties::SetHeatToVelocityCoeff(float heat_to_velocity_coeff)
-{
-	this->heat_to_velocity_coeff = heat_to_velocity_coeff;
-}
-
-void InternalCombustionEngineProperties::SetCoolingCoeff(float cooling_coeff)
-{
-	this->cooling_coeff = cooling_coeff;
-}
-/*---------------InternalCombustionEngineProperties--------------*/
-
 /*---------------------InternalCombustionEngine------------------*/
-int InternalCombustionEngine::Update()
-{
-	current_moment = CulcCurrentMoment();
-	current_mower = CulcCurrentPower();
-	current_acceleration = CulcCurrentAcceleration();
-	return ReturnCodes::Success;
-}
-
 InternalCombustionEngine::InternalCombustionEngine(
 	float inertia,
 	std::vector<float> velocities,
@@ -81,30 +55,64 @@ InternalCombustionEngine::InternalCombustionEngine(
 	this->cooling_coeff = cooling_coeff;
 }
 
-int InternalCombustionEngine::SetNextState()
+InternalCombustionEngine::~InternalCombustionEngine() {}
+
+void InternalCombustionEngine::SetInertia(float inertia)
+{
+	this->inertia = inertia;
+}
+
+void InternalCombustionEngine::SetHeatToMomentCoeff(float heat_to_moment_coeff)
+{
+	this->heat_to_moment_coeff = heat_to_moment_coeff;
+}
+
+void InternalCombustionEngine::SetHeatToVelocityCoeff(float heat_to_velocity_coeff)
+{
+	this->heat_to_velocity_coeff = heat_to_velocity_coeff;
+}
+
+void InternalCombustionEngine::SetCoolingCoeff(float cooling_coeff)
+{
+	this->cooling_coeff = cooling_coeff;
+}
+
+void InternalCombustionEngine::SetNextState()
 {
 	current_velocity += current_acceleration * Time::delta_time;
 	current_temperature += (current_moment * heat_to_moment_coeff + powf(current_velocity, 2.0f) * heat_to_velocity_coeff) * Time::delta_time;
 	current_temperature += cooling_coeff * (Temperature::ambient_temperature - current_temperature) * Time::delta_time;
-	return Update();
+	UpdateState();
 }
 
-float InternalCombustionEngine::CulcCurrentMoment()
+void InternalCombustionEngine::SetStartState()
+{
+	current_temperature = Temperature::ambient_temperature;
+	current_velocity = velocity_vec[0];
+}
+
+void InternalCombustionEngine::UpdateState()
+{
+	current_moment = CalcCurrentMoment();
+	current_power = CalcCurrentPower();
+	current_acceleration = CalcCurrentAcceleration();
+}
+
+float InternalCombustionEngine::CalcCurrentMoment() const
 {
 	if (!is_run)
 		return 0.0f;
 	return LinearInterpolation(velocity_vec, moment_vec, current_velocity);
 }
 
-float InternalCombustionEngine::CulcCurrentPower()
+float InternalCombustionEngine::CalcCurrentPower() const
 {
 	return current_velocity * current_moment / 1000.0f;
 }
 
-float InternalCombustionEngine::CulcCurrentAcceleration()
+float InternalCombustionEngine::CalcCurrentAcceleration() const
 {
 	return current_moment / inertia;
 }
-
 /*---------------------InternalCombustionEngine------------------*/
 

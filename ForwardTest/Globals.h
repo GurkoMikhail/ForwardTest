@@ -15,4 +15,5 @@ namespace Accuracy
 	extern float max_delta_velocity;
 }
 
-enum ReturnCodes { Success, Failure, NonOverheat };
+enum ReturnCodes { Success, Failure, NonAttachedEngine, NonOverheat };
+
