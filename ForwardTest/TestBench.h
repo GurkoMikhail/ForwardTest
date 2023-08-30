@@ -20,20 +20,26 @@ public:
 	/*-------------------SETTERS------------------------*/
 
 	/*-------------------GETTERS------------------------*/
-	const Engine* GetAttachedEnginePtr() const;
+	Engine* GetAttachedEnginePtr() const;
 	float GetTestTime() const;
 	/*-------------------GETTERS------------------------*/
 
 	/*----------------STATE-CONTROL---------------------*/
+	static enum ReturnCodes { Success, Failure, NonAttachedEngine };
 	bool CheckAttachedEngine() const;
 	int RunTest();
 	/*----------------STATE-CONTROL---------------------*/
 
 protected:
-	float test_time = 0.0f;
 	Engine* ptr_engine = nullptr;
 
+	/*----------------RESULT-FIELDS---------------------*/
+	float test_time = 0.0f;
+	/*----------------RESULT-FIELDS---------------------*/
+
+	/*------------HIDDEN-STATE-CONTROL------------------*/
 	virtual int MakeStep() = 0;
+	/*------------HIDDEN-STATE-CONTROL------------------*/
 };
 
 class SuperheatTestBench : public TestBench
@@ -52,15 +58,21 @@ public:
 	float GetEngineMaxTemperature() const;
 	/*-------------------GETTERS------------------------*/
 
-protected:
 	/*----------------STATE-CONTROL---------------------*/
-	bool CheckOverheat() const;
-	bool CheckReachableOfOverheat() const;
-	void UpdateMaxTemperature();
-	int MakeStep() override;
+	static enum ReturnCodes { Success, Failure, NonAttachedEngine, NonOverheat };
 	/*----------------STATE-CONTROL---------------------*/
 
+protected:
+	/*------------HIDDEN-STATE-CONTROL------------------*/
+	bool CheckOverheat() const;
+	bool CheckOverheatReachability() const;
+	void UpdateMaxTemperature();
+	int MakeStep() override;
+	/*------------HIDDEN-STATE-CONTROL------------------*/
+
+	/*----------------RESULT-FIELDS---------------------*/
 	float engine_max_temperature = -FLT_MAX;
+	/*----------------RESULT-FIELDS---------------------*/
 };
 
 class PowerTestBench : public TestBench
@@ -81,15 +93,17 @@ public:
 	/*-------------------GETTERS------------------------*/
 
 protected:
-	/*----------------STATE-CONTROL---------------------*/
+	/*------------HIDDEN-STATE-CONTROL------------------*/
 	bool CheckOverVelocity() const;
 	void UpdateMaxPower();
 	void UpdateMaxVelocity();
 	int MakeStep() override;
-	/*----------------STATE-CONTROL---------------------*/
+	/*------------HIDDEN-STATE-CONTROL------------------*/
 
+	/*----------------RESULT-FIELDS---------------------*/
 	float engine_max_power = -FLT_MAX;
 	float engine_max_velocity = -FLT_MAX;
 	float engine_velocity_at_max_power = -FLT_MAX;
+	/*----------------RESULT-FIELDS---------------------*/
 };
 

@@ -3,6 +3,7 @@
 #include "config.h"
 #include "Engine.h"
 #include "TestBench.h"
+
 using namespace main_params;
 
 void RunSuperheatTest();
@@ -27,10 +28,10 @@ void RunSuperheatTest()
 
 	switch (superheat_test_bench.RunTest())
 	{
-	case ReturnCodes::Success:
+	case SuperheatTestBench::ReturnCodes::Success:
 		std::cout << "Time to overheat = " << superheat_test_bench.GetTestTime() << " seconds\n";
 		break;
-	case ReturnCodes::NonOverheat:
+	case SuperheatTestBench::ReturnCodes::NonOverheat:
 		std::cout << "Engine does not overheat. Max temperature = " << superheat_test_bench.GetEngineMaxTemperature() << std::endl;
 		break;
 	default:
@@ -48,7 +49,7 @@ void RunPowerTest()
 
 	switch (power_test_bench.RunTest())
 	{
-	case ReturnCodes::Success:
+	case PowerTestBench::ReturnCodes::Success:
 		std::cout << "Max power = " << power_test_bench.GetMaxPower() << " kWatt\n";
 		std::cout << "Velocity at max power = " << power_test_bench.GetVelocityAtMaxPower() << " rad/sec\n";
 		break;

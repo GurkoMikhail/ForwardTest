@@ -16,6 +16,10 @@ public:
 	virtual ~Engine();
 	/*------------------DESTRUCTOR----------------------*/
 
+	/*-------------------SETTERS------------------------*/
+	void SetSuperheatTemperature(float superheat_temperature);
+	/*-------------------SETTERS------------------------*/
+
 	/*-------------------GETTERS------------------------*/
 	bool GetRunStatus() const;
 	float GetSuperheatTemperature() const;
@@ -34,7 +38,7 @@ public:
 	/*-----------------STATE-CONTROL--------------------*/
 
 protected:
-	float superheat_temperature = 110.0f;
+	float superheat_temperature = NAN;
 
 	/*-----------------STATE-FIELDS---------------------*/
 	bool is_run = false;
@@ -56,13 +60,13 @@ class InternalCombustionEngine : public Engine
 public:
 	/*-----------------CONSTRUCTORS---------------------*/
 	InternalCombustionEngine(
-		float inertia = 10.0f,
-		std::vector<float> velocities = { 0.0f, 75.0f, 150.0f, 200.0f, 250.0f, 300.0f },
-		std::vector<float> moments = { 20.0f, 75.0f, 100.0f, 105.0f, 75.0f, 0.0f },
-		float superheat_temperature = 110.0f,
-		float heat_to_moment_coeff = 0.01f,
-		float heat_to_velocity_coeff = 0.0001f,
-		float cooling_coeff = 0.1f
+		float inertia,
+		const std::vector<float>& velocities,
+		const std::vector<float>& moments,
+		float superheat_temperature,
+		float heat_to_moment_coeff,
+		float heat_to_velocity_coeff,
+		float cooling_coeff
 	);
 	/*-----------------CONSTRUCTORS---------------------*/
 
@@ -72,10 +76,18 @@ public:
 
 	/*-------------------SETTERS------------------------*/
 	void SetInertia(float inertia);
+	void SetMomentToVelocityDependency(const std::vector<float>& velocities, const std::vector<float>& moments);
 	void SetHeatToMomentCoeff(float heat_to_moment_coeff);
 	void SetHeatToVelocityCoeff(float heat_to_velocity_coeff);
 	void SetCoolingCoeff(float cooling_coeff);
 	/*-------------------SETTERS------------------------*/
+
+	/*-------------------GETTERS------------------------*/
+	float GetInertia() const;
+	float GetHeatToMomentCoeff() const;
+	float GetHeatToVelocityCoeff() const;
+	float GetCoolingCoeff() const;
+	/*-------------------GETTERS------------------------*/
 
 	/*-----------------STATE-CONTROL--------------------*/
 	void SetNextState() override;
@@ -83,11 +95,11 @@ public:
 
 protected:
 	float inertia;
+	std::vector<float> velocity_vec;
+	std::vector<float> moment_vec;
 	float heat_to_moment_coeff;
 	float heat_to_velocity_coeff;
 	float cooling_coeff;
-	std::vector<float> velocity_vec;
-	std::vector<float> moment_vec;
 
 	/*--------------HIDDEN-STATE-CONTROL----------------*/
 	void UpdateState() override;

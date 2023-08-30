@@ -1,6 +1,6 @@
 #include "other.h"
 
-float LinearInterpolation(std::vector<float> const& x_vec, std::vector<float> const& y_vec, float value)
+float LinearInterpolation(const std::vector<float>& x_vec, const std::vector<float>& y_vec, float value)
 {
 	for (unsigned int i = 0; i < x_vec.size() - 1; i++)
 	{

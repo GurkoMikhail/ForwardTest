@@ -20,6 +20,11 @@ float Engine::GetCurrentPower() const { return current_power; }
 
 float Engine::GetCurrentAcceleration() const { return current_acceleration; }
 
+void Engine::SetSuperheatTemperature(float superheat_temperature)
+{
+	this->superheat_temperature = superheat_temperature;
+}
+
 void Engine::Start()
 {
 	SetStartState();
@@ -38,21 +43,20 @@ void Engine::Stop()
 /*---------------------InternalCombustionEngine------------------*/
 InternalCombustionEngine::InternalCombustionEngine(
 	float inertia,
-	std::vector<float> velocities,
-	std::vector<float> moments,
+	const std::vector<float>& velocities,
+	const std::vector<float>& moments,
 	float superheat_temperature,
 	float heat_to_moment_coeff,
 	float heat_to_velocity_coeff,
 	float cooling_coeff
 )
 {
-	this->inertia = inertia;
-	velocity_vec = velocities;
-	moment_vec = moments;
-	this->superheat_temperature = superheat_temperature;
-	this->heat_to_moment_coeff = heat_to_moment_coeff;
-	this->heat_to_velocity_coeff = heat_to_velocity_coeff;
-	this->cooling_coeff = cooling_coeff;
+	SetInertia(inertia);
+	SetMomentToVelocityDependency(velocities, moments);
+	SetSuperheatTemperature(superheat_temperature);
+	SetHeatToMomentCoeff(heat_to_moment_coeff);
+	SetHeatToVelocityCoeff(heat_to_velocity_coeff);
+	SetCoolingCoeff(cooling_coeff);
 }
 
 InternalCombustionEngine::~InternalCombustionEngine() {}
@@ -60,6 +64,12 @@ InternalCombustionEngine::~InternalCombustionEngine() {}
 void InternalCombustionEngine::SetInertia(float inertia)
 {
 	this->inertia = inertia;
+}
+
+void InternalCombustionEngine::SetMomentToVelocityDependency(const std::vector<float>& velocities, const std::vector<float>& moments)
+{
+	velocity_vec = velocities;
+	moment_vec = moments;
 }
 
 void InternalCombustionEngine::SetHeatToMomentCoeff(float heat_to_moment_coeff)
@@ -76,6 +86,14 @@ void InternalCombustionEngine::SetCoolingCoeff(float cooling_coeff)
 {
 	this->cooling_coeff = cooling_coeff;
 }
+
+float InternalCombustionEngine::GetInertia() const { return inertia; }
+
+float InternalCombustionEngine::GetHeatToMomentCoeff() const { return heat_to_moment_coeff; }
+
+float InternalCombustionEngine::GetHeatToVelocityCoeff() const { return heat_to_velocity_coeff; }
+
+float InternalCombustionEngine::GetCoolingCoeff() const { return cooling_coeff; }
 
 void InternalCombustionEngine::SetNextState()
 {

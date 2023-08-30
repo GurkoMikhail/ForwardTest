@@ -15,7 +15,7 @@ void TestBench::AttachEngine(Engine& engine)
 	this->ptr_engine = &engine;
 }
 
-const Engine* TestBench::GetAttachedEnginePtr() const
+Engine* TestBench::GetAttachedEnginePtr() const
 {
 	return ptr_engine;
 }
@@ -65,7 +65,7 @@ bool SuperheatTestBench::CheckOverheat() const
 	return engine.GetSuperheatTemperature() <= engine.GetCurrentTemperature();
 }
 
-bool SuperheatTestBench::CheckReachableOfOverheat() const
+bool SuperheatTestBench::CheckOverheatReachability() const
 {
 	Engine& engine = *ptr_engine;
 	float delta_temperature = abs(engine.GetCurrentTemperature() - engine_max_temperature);
@@ -83,7 +83,7 @@ int SuperheatTestBench::MakeStep()
 	Engine& engine = *ptr_engine;
 
 	engine.SetNextState();
-	if (!CheckReachableOfOverheat())
+	if (!CheckOverheatReachability())
 	{
 		engine.Stop();
 		test_time = INFINITY;
