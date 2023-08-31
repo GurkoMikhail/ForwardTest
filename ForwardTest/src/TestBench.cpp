@@ -136,7 +136,7 @@ void PowerTestBench::UpdateMaxPower()
 void PowerTestBench::UpdateMaxVelocity()
 {
 	Engine& engine = *ptr_engine;
-	engine_max_velocity = engine.GetCurrentVelocity();
+	engine_max_velocity = std::max(engine.GetCurrentVelocity(), engine_max_velocity);
 }
 
 int PowerTestBench::MakeStep()
@@ -146,11 +146,10 @@ int PowerTestBench::MakeStep()
 	engine.SetNextState();
 	if (CheckOverVelocity())
 	{
-		UpdateMaxVelocity();
 		engine.Stop();
 	}
-	UpdateMaxPower();
 	UpdateMaxVelocity();
+	UpdateMaxPower();
 	return ReturnCodes::Success;
 }
 /*---------------------------PowerTestBench-------------------------*/
