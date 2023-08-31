@@ -131,10 +131,6 @@ void PowerTestBench::UpdateMaxPower()
 		engine_max_power = engine_current_power;
 		engine_velocity_at_max_power = engine_current_velocity;
 	}
-	else
-	{
-		int p = 20;
-	}
 }
 
 void PowerTestBench::UpdateMaxVelocity()
