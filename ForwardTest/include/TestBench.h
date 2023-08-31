@@ -25,7 +25,7 @@ public:
 	/*-------------------GETTERS------------------------*/
 
 	/*----------------STATE-CONTROL---------------------*/
-	static enum ReturnCodes { Success, Failure, NonAttachedEngine };
+	enum ReturnCodes { Success, Failure, NonAttachedEngine };
 	bool CheckAttachedEngine() const;
 	int RunTest();
 	/*----------------STATE-CONTROL---------------------*/
@@ -59,7 +59,7 @@ public:
 	/*-------------------GETTERS------------------------*/
 
 	/*----------------STATE-CONTROL---------------------*/
-	static enum ReturnCodes { Success, Failure, NonAttachedEngine, NonOverheat };
+	enum ReturnCodes { Success, Failure, NonAttachedEngine, NonOverheat };
 	/*----------------STATE-CONTROL---------------------*/
 
 protected:
