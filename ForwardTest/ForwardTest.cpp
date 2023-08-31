@@ -21,7 +21,7 @@ int main()
 
 void RunSuperheatTest()
 {
-	InternalCombustionEngine engine(inertia, velocities, moments, superheat_temperature, heat_to_moment_coeff, heat_to_velocity_coeff, cooling_coeff);
+	InternalCombustionEngine engine(inertia, moment_to_velocity_dep, superheat_temperature, heat_to_moment_coeff, heat_to_velocity_coeff, cooling_coeff);
 
 	SuperheatTestBench superheat_test_bench;
 	superheat_test_bench.AttachEngine(engine);
@@ -42,7 +42,7 @@ void RunSuperheatTest()
 
 void RunPowerTest()
 {
-	InternalCombustionEngine engine(inertia, velocities, moments, superheat_temperature, heat_to_moment_coeff, heat_to_velocity_coeff, cooling_coeff);
+	InternalCombustionEngine engine(inertia, moment_to_velocity_dep, superheat_temperature, heat_to_moment_coeff, heat_to_velocity_coeff, cooling_coeff);
 
 	PowerTestBench power_test_bench;
 	power_test_bench.AttachEngine(engine);

@@ -24,7 +24,7 @@
     <ClCompile Include="src\TestBench.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="src\other.cpp">
+    <ClCompile Include="src\Interpolation.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="src\Globals.cpp">
@@ -41,7 +41,7 @@
     <ClInclude Include="include\Globals.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="include\other.h">
+    <ClInclude Include="include\Interpolation.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="config.h">

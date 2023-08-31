@@ -2,7 +2,7 @@
 
 #include "Globals.h"
 #include "vector"
-#include "other.h"
+#include "Interpolation.h"
 
 
 class Engine {
@@ -61,8 +61,7 @@ public:
 	/*-----------------CONSTRUCTORS---------------------*/
 	InternalCombustionEngine(
 		float inertia,
-		const std::vector<float>& velocities,
-		const std::vector<float>& moments,
+		const InterpolatedDependency& moment_to_velocity_dep,
 		float superheat_temperature,
 		float heat_to_moment_coeff,
 		float heat_to_velocity_coeff,
@@ -76,7 +75,7 @@ public:
 
 	/*-------------------SETTERS------------------------*/
 	void SetInertia(float inertia);
-	void SetMomentToVelocityDependency(const std::vector<float>& velocities, const std::vector<float>& moments);
+	void SetMomentToVelocityDependency(const InterpolatedDependency& moment_to_velocity_dep);
 	void SetHeatToMomentCoeff(float heat_to_moment_coeff);
 	void SetHeatToVelocityCoeff(float heat_to_velocity_coeff);
 	void SetCoolingCoeff(float cooling_coeff);
@@ -95,8 +94,7 @@ public:
 
 protected:
 	float inertia;
-	std::vector<float> velocity_vec;
-	std::vector<float> moment_vec;
+	InterpolatedDependency moment_to_velocity_dep;
 	float heat_to_moment_coeff;
 	float heat_to_velocity_coeff;
 	float cooling_coeff;

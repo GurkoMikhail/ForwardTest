@@ -133,14 +133,14 @@
     <ClCompile Include="ForwardTest.cpp" />
     <ClCompile Include="src\Engine.cpp" />
     <ClCompile Include="src\Globals.cpp" />
-    <ClCompile Include="src\other.cpp" />
+    <ClCompile Include="src\Interpolation.cpp" />
     <ClCompile Include="src\TestBench.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config.h" />
     <ClInclude Include="include\Engine.h" />
     <ClInclude Include="include\Globals.h" />
-    <ClInclude Include="include\other.h" />
+    <ClInclude Include="include\Interpolation.h" />
     <ClInclude Include="include\TestBench.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

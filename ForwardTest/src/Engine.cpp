@@ -43,8 +43,7 @@ void Engine::Stop()
 /*---------------------InternalCombustionEngine------------------*/
 InternalCombustionEngine::InternalCombustionEngine(
 	float inertia,
-	const std::vector<float>& velocities,
-	const std::vector<float>& moments,
+	const InterpolatedDependency& moment_to_velocity_dep,
 	float superheat_temperature,
 	float heat_to_moment_coeff,
 	float heat_to_velocity_coeff,
@@ -52,7 +51,7 @@ InternalCombustionEngine::InternalCombustionEngine(
 )
 {
 	SetInertia(inertia);
-	SetMomentToVelocityDependency(velocities, moments);
+	SetMomentToVelocityDependency(moment_to_velocity_dep);
 	SetSuperheatTemperature(superheat_temperature);
 	SetHeatToMomentCoeff(heat_to_moment_coeff);
 	SetHeatToVelocityCoeff(heat_to_velocity_coeff);
@@ -66,10 +65,9 @@ void InternalCombustionEngine::SetInertia(float inertia)
 	this->inertia = inertia;
 }
 
-void InternalCombustionEngine::SetMomentToVelocityDependency(const std::vector<float>& velocities, const std::vector<float>& moments)
+void InternalCombustionEngine::SetMomentToVelocityDependency(const InterpolatedDependency& moment_to_velocity_dep)
 {
-	velocity_vec = velocities;
-	moment_vec = moments;
+	this->moment_to_velocity_dep = moment_to_velocity_dep;
 }
 
 void InternalCombustionEngine::SetHeatToMomentCoeff(float heat_to_moment_coeff)
@@ -106,7 +104,7 @@ void InternalCombustionEngine::SetNextState()
 void InternalCombustionEngine::SetStartState()
 {
 	current_temperature = Temperature::ambient_temperature;
-	current_velocity = velocity_vec[0];
+	current_velocity = moment_to_velocity_dep[0].GetX();
 }
 
 void InternalCombustionEngine::UpdateState()
@@ -120,7 +118,8 @@ float InternalCombustionEngine::CalcCurrentMoment() const
 {
 	if (!is_run)
 		return 0.0f;
-	return LinearInterpolation(velocity_vec, moment_vec, current_velocity);
+	Point point = moment_to_velocity_dep.GetInterpolatedPoint(current_velocity);
+	return point.GetY();
 }
 
 float InternalCombustionEngine::CalcCurrentPower() const
