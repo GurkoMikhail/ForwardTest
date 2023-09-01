@@ -5,7 +5,7 @@ InterpolatedDependency::InterpolatedDependency() {}
 
 InterpolatedDependency::InterpolatedDependency(const std::vector<float>& x_vec, const std::vector<float>& y_vec)
 {
-	InterpolatedDependency& container = *this;
+	auto& container = *this;
 
 	size_t size = std::min(x_vec.size(), y_vec.size());
 	container.reserve(size);
@@ -47,11 +47,15 @@ Point InterpolatedDependency::Interpolate(float x_value) const
 {
 	auto& container = *this;
 
+	if (x_value < container.front().GetX()) { return Point(x_value, container.front().GetY()); }
+	if (x_value > container.back().GetX()) { return Point(x_value, container.back().GetY()); }
+
+	float y_value = NAN;
+
 	for (int i = 0; i < container.size() - 1; i++)
 	{
-		auto& point = container[i];
-		auto& next_point = container[i + 1];
-		float y_value = NAN;
+		const Point& point = container[i];
+		const Point& next_point = container[i + 1];
 
 		if (x_value >= next_point.GetX()) { continue; }
 
@@ -61,7 +65,7 @@ Point InterpolatedDependency::Interpolate(float x_value) const
 
 		return Point(x_value, y_value);
 	}
-	return Point(x_value, container.back().GetY());
+	return Point(x_value, y_value);
 }
 
 Point::Point(float x, float y)
