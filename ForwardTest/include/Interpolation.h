@@ -2,6 +2,7 @@
 
 #include "vector"
 #include "algorithm"
+#include "cmath"
 
 class Point
 {

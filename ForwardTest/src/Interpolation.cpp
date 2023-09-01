@@ -5,13 +5,11 @@ InterpolatedDependency::InterpolatedDependency() {}
 
 InterpolatedDependency::InterpolatedDependency(const std::vector<float>& x_vec, const std::vector<float>& y_vec)
 {
-	auto& container = *this;
-
 	size_t size = std::min(x_vec.size(), y_vec.size());
-	container.reserve(size);
+	this->reserve(size);
 	for (size_t i = 0; i < size; i++)
 	{
-		container.push_back(Point(x_vec[i], y_vec[i]));
+		this->push_back(Point(x_vec[i], y_vec[i]));
 	}
 	Sort();
 }
@@ -25,9 +23,7 @@ Point InterpolatedDependency::GetInterpolatedPoint(float x) const
 
 void InterpolatedDependency::PushPoint(Point point)
 {
-	auto& container = *this;
-
-	container.push_back(point);
+	this->push_back(point);
 	Sort();
 }
 
@@ -38,33 +34,33 @@ void InterpolatedDependency::PushPoint(float x, float y)
 
 void InterpolatedDependency::Sort()
 {
-	auto& container = *this;
-
-	std::sort(container.begin(), container.end(), [](Point a, Point b) { return a.GetX() < b.GetX(); });
+	std::sort(this->begin(), this->end(), [](Point a, Point b) { return a.GetX() < b.GetX(); });
 }
 
 Point InterpolatedDependency::Interpolate(float x_value) const
 {
-	auto& container = *this;
+	auto& self = *this;
 
-	if (x_value < container.front().GetX()) { return Point(x_value, container.front().GetY()); }
-	if (x_value > container.back().GetX()) { return Point(x_value, container.back().GetY()); }
+	/*Check boundaries*/
+	if (x_value <= self.front().GetX()) { return Point(x_value, self.front().GetY()); }
+	if (x_value >= self.back().GetX()) { return Point(x_value, self.back().GetY()); }
+	/*--------------------------------------------------------------------------------*/
 
-	float y_value = NAN;
+	/*Find lower bound*/
+	auto predicate = [&x_value](Point point) { return point.GetX() > x_value; };
+	auto lower_bound = std::find_if(self.begin() + 1, self.end(), predicate);
+	/*--------------------------------------------------------------------------------*/
 
-	for (int i = 0; i < container.size() - 1; i++)
-	{
-		const Point& point = container[i];
-		const Point& next_point = container[i + 1];
+	/*Def boundary points*/
+	auto& point = lower_bound[-1];
+	auto& next_point = lower_bound[0];
+	/*--------------------------------------------------------------------------------*/
 
-		if (x_value >= next_point.GetX()) { continue; }
+	/*Interpolating*/
+	Point diff_point((next_point.GetX() - point.GetX()), (next_point.GetY() - point.GetY()));
+	float y_value = point.GetY() + (diff_point.GetY() / diff_point.GetX()) * (x_value - point.GetX());
+	/*--------------------------------------------------------------------------------*/
 
-		Point diff_point((next_point.GetX() - point.GetX()), (next_point.GetY() - point.GetY()));
-
-		y_value = point.GetY() + (diff_point.GetY() / diff_point.GetX()) * (x_value - point.GetX());
-
-		return Point(x_value, y_value);
-	}
 	return Point(x_value, y_value);
 }
 
