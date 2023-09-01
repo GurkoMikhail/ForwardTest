@@ -96,7 +96,8 @@ float InternalCombustionEngine::GetCoolingCoeff() const { return cooling_coeff; 
 void InternalCombustionEngine::SetNextState()
 {
 	current_velocity += current_acceleration * Time::delta_time;
-	current_temperature += (current_moment * heat_to_moment_coeff + powf(current_velocity, 2.0f) * heat_to_velocity_coeff) * Time::delta_time;
+	current_temperature += current_moment * heat_to_moment_coeff * Time::delta_time;
+	current_temperature += (current_velocity * current_velocity) * heat_to_velocity_coeff * Time::delta_time;
 	current_temperature += cooling_coeff * (Temperature::ambient_temperature - current_temperature) * Time::delta_time;
 	UpdateState();
 }
