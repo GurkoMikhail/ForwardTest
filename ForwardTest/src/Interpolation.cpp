@@ -47,18 +47,24 @@ Point InterpolatedDependency::Interpolate(float x_value) const
 	/*--------------------------------------------------------------------------------*/
 
 	/*Find upper bound*/
-	auto predicate = [&x_value](Point point) { return point.GetX() > x_value; };
+	auto predicate = [&x_value](const Point& point) { return x_value < point.GetX(); };
 	auto upper_bound = std::find_if(self.begin() + 1, self.end(), predicate);
 	/*--------------------------------------------------------------------------------*/
 
 	/*Def boundary points*/
 	auto& point = upper_bound[-1];
 	auto& next_point = upper_bound[0];
+
+	assert(x_value >= point.GetX());
+	assert(x_value < next_point.GetX());
 	/*--------------------------------------------------------------------------------*/
 
 	/*Interpolating*/
 	Point diff_point((next_point.GetX() - point.GetX()), (next_point.GetY() - point.GetY()));
 	float y_value = point.GetY() + (diff_point.GetY() / diff_point.GetX()) * (x_value - point.GetX());
+
+	assert(y_value + FLT_EPSILON > std::min(point.GetY(), next_point.GetY()));
+	assert(y_value - FLT_EPSILON < std::max(point.GetY(), next_point.GetY()));
 	/*--------------------------------------------------------------------------------*/
 
 	return Point(x_value, y_value);
