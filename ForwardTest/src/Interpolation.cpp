@@ -46,14 +46,14 @@ Point InterpolatedDependency::Interpolate(float x_value) const
 	if (x_value >= self.back().GetX()) { return Point(x_value, self.back().GetY()); }
 	/*--------------------------------------------------------------------------------*/
 
-	/*Find lower bound*/
+	/*Find upper bound*/
 	auto predicate = [&x_value](Point point) { return point.GetX() > x_value; };
-	auto lower_bound = std::find_if(self.begin() + 1, self.end(), predicate);
+	auto upper_bound = std::find_if(self.begin() + 1, self.end(), predicate);
 	/*--------------------------------------------------------------------------------*/
 
 	/*Def boundary points*/
-	auto& point = lower_bound[-1];
-	auto& next_point = lower_bound[0];
+	auto& point = upper_bound[-1];
+	auto& next_point = upper_bound[0];
 	/*--------------------------------------------------------------------------------*/
 
 	/*Interpolating*/
