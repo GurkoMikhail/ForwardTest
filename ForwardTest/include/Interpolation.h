@@ -7,6 +7,8 @@
 class Point
 {
 public:
+	friend class InterpolatedDependency;
+
 	/*-----------------CONSTRUCTORS---------------------*/
 	Point(float x, float y);
 	/*-----------------CONSTRUCTORS---------------------*/
@@ -16,8 +18,8 @@ public:
 	/*------------------DESTRUCTOR----------------------*/
 
 	/*-------------------GETTERS------------------------*/
-	float GetX() const;
-	float GetY() const;
+	const float& GetX() const;
+	const float& GetY() const;
 	/*-------------------GETTERS------------------------*/
 
 private:
@@ -25,7 +27,7 @@ private:
 	float y;
 };
 
-class InterpolatedDependency: public std::vector<Point>
+class InterpolatedDependency : public std::vector<Point>
 {
 public:
 	/*-----------------CONSTRUCTORS---------------------*/

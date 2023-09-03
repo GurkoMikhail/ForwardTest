@@ -1,6 +1,22 @@
 #include "Interpolation.h"
 
 
+/*-----------------------------Point-----------------------------*/
+Point::Point(float x, float y)
+{
+	this->x = x;
+	this->y = y;
+}
+
+Point::~Point() {}
+
+const float& Point::GetX() const { return x; }
+
+const float& Point::GetY() const { return y; }
+/*-----------------------------Point-----------------------------*/
+
+
+/*---------------------InterpolatedDependency--------------------*/
 InterpolatedDependency::InterpolatedDependency() {}
 
 InterpolatedDependency::InterpolatedDependency(const std::vector<float>& x_vec, const std::vector<float>& y_vec)
@@ -34,7 +50,8 @@ void InterpolatedDependency::PushPoint(float x, float y)
 
 void InterpolatedDependency::Sort()
 {
-	std::sort(this->begin(), this->end(), [](Point a, Point b) { return a.GetX() < b.GetX(); });
+	auto predicate = [](Point a, Point b) { return a.x < b.x; };
+	std::sort(this->begin(), this->end(), predicate);
 }
 
 Point InterpolatedDependency::Interpolate(float x_value) const
@@ -42,12 +59,12 @@ Point InterpolatedDependency::Interpolate(float x_value) const
 	auto& self = *this;
 
 	/*Check boundaries*/
-	if (x_value <= self.front().GetX()) { return Point(x_value, self.front().GetY()); }
-	if (x_value >= self.back().GetX()) { return Point(x_value, self.back().GetY()); }
+	if (x_value <= self.front().x) { return Point(x_value, self.front().y); }
+	if (x_value >= self.back().x) { return Point(x_value, self.back().y); }
 	/*--------------------------------------------------------------------------------*/
 
 	/*Find upper bound*/
-	auto predicate = [&x_value](const Point& point) { return x_value < point.GetX(); };
+	auto predicate = [&x_value](const Point& point) { return x_value < point.x; };
 	auto upper_bound = std::find_if(self.begin() + 1, self.end(), predicate);
 	/*--------------------------------------------------------------------------------*/
 
@@ -55,30 +72,19 @@ Point InterpolatedDependency::Interpolate(float x_value) const
 	auto& point = upper_bound[-1];
 	auto& next_point = upper_bound[0];
 
-	assert(x_value >= point.GetX());
-	assert(x_value < next_point.GetX());
+	assert(x_value >= point.x);
+	assert(x_value < next_point.x);
 	/*--------------------------------------------------------------------------------*/
 
 	/*Interpolating*/
-	Point diff_point((next_point.GetX() - point.GetX()), (next_point.GetY() - point.GetY()));
-	float y_value = point.GetY() + (diff_point.GetY() / diff_point.GetX()) * (x_value - point.GetX());
+	Point diff_point((next_point.x - point.x), (next_point.y - point.y));
+	float y_value = point.y + (diff_point.y / diff_point.x) * (x_value - point.x);
 
-	assert(y_value + FLT_EPSILON > std::min(point.GetY(), next_point.GetY()));
-	assert(y_value - FLT_EPSILON < std::max(point.GetY(), next_point.GetY()));
+	assert(y_value + FLT_EPSILON > std::min(point.y, next_point.y));
+	assert(y_value - FLT_EPSILON < std::max(point.y, next_point.y));
 	/*--------------------------------------------------------------------------------*/
 
 	return Point(x_value, y_value);
 }
-
-Point::Point(float x, float y)
-{
-	this->x = x;
-	this->y = y;
-}
-
-Point::~Point() {}
-
-float Point::GetX() const { return x; }
-
-float Point::GetY() const { return y; }
+/*---------------------InterpolatedDependency--------------------*/
 

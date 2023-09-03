@@ -105,7 +105,7 @@ void InternalCombustionEngine::SetNextState()
 void InternalCombustionEngine::SetStartState()
 {
 	current_temperature = Temperature::ambient_temperature;
-	current_velocity = moment_to_velocity_dep[0].GetX();
+	current_velocity = moment_to_velocity_dep.front().GetX();
 }
 
 void InternalCombustionEngine::UpdateState()
